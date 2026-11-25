@@ -4,9 +4,14 @@ import cp.campus.todolist.dto.CategoriaRequest;
 import cp.campus.todolist.dto.CategoriaResponse;
 import cp.campus.todolist.service.CategoriaService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -28,6 +33,25 @@ public class CategoriaController {
     //para despligar con un aparche tomcat y los archivos .JAR
     @PostMapping
     @Operation(summary = "crear categoria")//comentario en el endpoint para saber que hace
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Recurso creado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = CategoriaResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Datos invalidos",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class
+                            )
+                    )
+            )
+    })
     public ResponseEntity<CategoriaResponse> crear(@Valid @RequestBody CategoriaRequest request){
         CategoriaResponse resultado= categoriaService.crear(request);
 
@@ -49,6 +73,30 @@ public class CategoriaController {
 
     @GetMapping("/{id}")//le agrega esto a la ruta final y el PathVariable agarra el id ingresado y lo cambia al id de la url
     @Operation(summary = "Buscar categoria por su id")//comentario en el endpoint para saber que hace
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Recurso encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = CategoriaResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "ID invalidos",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Recurso no encontrado",
+                    content = @Content
+            )
+    })
     public ResponseEntity<CategoriaResponse> buscarPorId(@PathVariable @Positive Long id){
         return categoriaService.buscarPorId(id)
                 .map(ResponseEntity::ok)
